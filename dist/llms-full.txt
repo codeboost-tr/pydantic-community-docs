@@ -1,0 +1,149 @@
+# Pydantic Docs
+
+What is Pydantic and how it brings runtime validation to Python type hints
+
+## Documentation
+
+### Introduction
+
+Path: `/introduction.html`
+
+What is Pydantic and how it brings runtime validation to Python type hints
+
+Pydantic is the most widely used data validation library for Python. It provides runtime validation of data using Python type annotations, ensuring that the data your code receives matches the expected types and constraints. What is Pydantic? Pydantic enforces type hints at runtime and provides user-friendly errors when data is invalid. It's the foundation for FastAPI, LangChain, SQLModel, and thousands of other Python projects. Key Features Runtime type validation via Python type annotations JSON schema generation for any model Serialization and deserialization Strict mode and data coercion Custom validators and model configurations Support for complex generics and recursive models Version This documentation covers Pydantic v2, the current major version with significant improvements over v1, including rewritten core validation engine in Rust (pydantic-core).
+
+### Installation
+
+Path: `/installation.html`
+
+Install Pydantic via pip, uv, or poetry
+
+pip Copy pip install pydantic uv Copy uv add pydantic Poetry Copy poetry add pydantic Verify Installation Copy import pydantic print (pydantic. __version__ ) # 2.x Optional Dependencies Install with email validation support: Copy pip install "pydantic[email]"
+
+### Basic Usage
+
+Path: `/basic-usage.html`
+
+Create your first Pydantic model and validate data
+
+Define a Model Create a model by inheriting from BaseModel : Copy from pydantic import BaseModel class User ( BaseModel ): name: str age: int email: str is_active: bool = True Validate Data Pass data as keyword arguments: Copy user = User( name = "Alice" , age = 30 , email = "alice@example.com" ) print (user) # name='Alice' age=30 email='alice@example.com' is_active=True JSON Parsing Parse data from a JSON string or dict: Copy data = '{"name": "Bob", "age": 25, "email": "bob@test.com"}' user = User.model_validate_json(data) Access Fields Copy print (user.name) # "Alice" print (user.age) # 30 print (user.model_dump()) # dict print (user.model_dump_json()) # JSON string
+
+### Models
+
+Path: `/models.html`
+
+Define and configure Pydantic models with BaseModel
+
+BaseModel Every Pydantic model inherits from BaseModel : Copy from pydantic import BaseModel class Product ( BaseModel ): id : int name: str price: float in_stock: bool = True Nested Models Models can contain other models: Copy class Address ( BaseModel ): street: str city: str zip : str class Customer ( BaseModel ): name: str address: Address Model Methods Copy # Convert to dict product.model_dump() # Convert to JSON product.model_dump_json( indent = 2 ) # Create from dict Product.model_validate({ "id" : 1 , "name" : "Widget" , "price" : 9.99 }) # Create from JSON Product.model_validate_json( '{"id": 1, "name": "Widget", "price": 9.99}' ) # Copy with modifications product.model_copy( update = { "price" : 7.99 }) Immutability Make fields read-only after initialization: Copy from pydantic import ConfigDict class ImmutableModel ( BaseModel ): model_config = ConfigDict( frozen = True ) name: str
+
+### Fields
+
+Path: `/fields.html`
+
+Field definitions with constraints, defaults, and metadata
+
+Basic Fields Copy from pydantic import BaseModel, Field class Item ( BaseModel ): name: str = Field( min_length = 3 , max_length = 100 ) price: float = Field( gt = 0 , le = 10000 ) quantity: int = Field( default = 0 , ge = 0 ) Field Constraints Copy class Product ( BaseModel ): code: str = Field( pattern = r " ^ PROD- \d {4} $ " ) rating: float = Field( ge = 0.0 , le = 5.0 ) tags: list[ str ] = Field( min_length = 1 , max_length = 10 ) metadata: dict = Field( default_factory = dict ) Field Metadata Copy class User ( BaseModel ): name: str = Field( title = "Full Name" , description = "The user's full name" ) age: int = Field( ge = 0 , le = 150 , examples = [ 25 , 30 ]) email: str = Field( frozen = True ) # cannot be modified after init Default Factories Copy from uuid import uuid4 from datetime import datetime class Order ( BaseModel ): id : str = Field( default_factory = lambda : uuid4().hex) created_at: datetime = Field( default_factory = datetime.now) Deprecated Fields Copy class Config ( BaseModel ): old_field: str = Field( deprecated = "Use new_field instead" ) new_field: str = ""
+
+### Validators
+
+Path: `/validators.html`
+
+Custom validation with field_validator and model_validator
+
+Field Validators Use @field_validator to validate individual fields: Copy from pydantic import BaseModel, field_validator class User ( BaseModel ): name: str password: str @field_validator ( "password" ) @ classmethod def password_strength ( cls , v : str ) -> str : if len (v) 8 : raise ValueError ( "Password must be at least 8 characters" ) if not any (c.isdigit() for c in v): raise ValueError ( "Password must contain a number" ) return v Multiple Fields Copy @field_validator ( "name" , "email" ) @ classmethod def check_not_empty ( cls , v : str ) -> str : if not v.strip(): raise ValueError ( "Must not be empty" ) return v Before and After Validators Copy @field_validator ( "price" , mode = "before" ) @ classmethod def convert_price ( cls , v ): if isinstance (v, str ): return float (v.replace( "$" , "" )) return v Model Validators Validate across multiple fields: Copy from pydantic import model_validator class Order ( BaseModel ): items: list[ str ] coupon: str | None = None @model_validator ( mode = "after" ) def check_coupon ( self ): if self .coupon and len ( self .items) 3 : raise ValueError ( "Coupon requires at least 3 items" ) return self
+
+### Serialization
+
+Path: `/serialization.html`
+
+Convert Pydantic models to dict, JSON, and custom formats
+
+model_dump Convert a model to a Python dictionary: Copy user = User( name = "Alice" , age = 30 ) data = user.model_dump() # {"name": "Alice", "age": 30} # Exclude specific fields user.model_dump( exclude = { "password" }) # Include only specific fields user.model_dump( include = { "name" , "email" }) # Serialize with by_alias user.model_dump( by_alias = True ) model_dump_json Serialize to JSON string: Copy json_str = user.model_dump_json( indent = 2 ) # Custom serialization user.model_dump_json( exclude_none = True , round_trip = True ) Custom Serialization Copy from pydantic import field_serializer class Product ( BaseModel ): price: Decimal @field_serializer ( "price" ) def serialize_price ( self , value : Decimal) -> str : return f "$ { value :.2f} " Serialization Context Pass context to serializers: Copy user.model_dump( context = { "include_secret" : False })
+
+### Configuration
+
+Path: `/config.html`
+
+Model configuration with ConfigDict for behavior customization
+
+ConfigDict Use model_config to control model behavior: Copy from pydantic import BaseModel, ConfigDict class Settings ( BaseModel ): model_config = ConfigDict( frozen = True , # immutable after creation str_strip_whitespace = True , validate_default = True , extra = "forbid" , # reject unknown fields ) name: str value: int Common Options Copy class Config ( BaseModel ): model_config = ConfigDict( # Validation extra = "ignore" , # ignore extra fields (default) extra = "forbid" , # reject extra fields extra = "allow" , # allow extra fields frozen = True , # make immutable populate_by_name = True , # allow by field name or alias # String handling str_strip_whitespace = True , str_to_lower = True , str_to_upper = False , # Type coercion coerce_numbers_to_str = True , # Error handling hide_input_in_errors = True , ) Alias Generator Copy class Model ( BaseModel ): model_config = ConfigDict( alias_generator = lambda s : s.upper(), populate_by_name = True , ) first_name: str # accepts "firstName" or "FIRST_NAME"
+
+### String and Number Types
+
+Path: `/strings-numbers.html`
+
+Pydantic field types for strings, numbers, and booleans
+
+String Types Copy from pydantic import BaseModel from pydantic.types import StringConstraints from typing import Annotated class StringModel ( BaseModel ): name: str code: Annotated[ str , StringConstraints( min_length = 3 , max_length = 10 )] pattern: Annotated[ str , StringConstraints( pattern = r " ^ [ A-Z ] + $ " )] email: str # validated by email-validator if installed Number Types Copy class NumberModel ( BaseModel ): age: int price: float rating: float = 0.0 # Constrained numbers positive: int = Field( gt = 0 ) non_negative: int = Field( ge = 0 ) percentage: float = Field( ge = 0 , le = 100 ) multiple: int = Field( multiple_of = 5 ) Boolean Copy class BooleanModel ( BaseModel ): is_active: bool is_admin: bool = False Booleans accept True , False , 1 , 0 , "true" , "false" , "yes" , "no" , "on" , "off" by default.
+
+### Date and Time Types
+
+Path: `/dates.html`
+
+Date, time, datetime, timedelta, and duration field types
+
+Date and Datetime Copy from datetime import date, datetime, time, timedelta from pydantic import BaseModel class Event ( BaseModel ): name: str date: date start_time: datetime end_time: datetime | None = None duration: timedelta Date Validation Copy class Schedule ( BaseModel ): event_date: date = Field( ge = date( 2024 , 1 , 1 )) timestamp: datetime meeting_time: time Past and Future Use validators for relative date constraints: Copy from datetime import datetime, timezone from pydantic import field_validator class Post ( BaseModel ): title: str created_at: datetime published_at: datetime | None = None @field_validator ( "created_at" ) @ classmethod def not_future ( cls , v : datetime) -> datetime: if v > datetime.now(timezone.utc): raise ValueError ( "Date cannot be in the future" ) return v Duration Copy class Task ( BaseModel ): name: str estimated: timedelta = timedelta( hours = 1 ) deadline: datetime
+
+### Collections and Mapping Types
+
+Path: `/collections.html`
+
+List, set, dict, tuple, and other collection types in Pydantic
+
+Lists Copy class Team ( BaseModel ): members: list[ str ] # list of strings scores: list[ int ] # list of integers nested: list[list[ float ]] # nested lists Sets Copy class Tags ( BaseModel ): tags: set[ str ] # unique strings unique_ids: set[ int ] # unique integers Dictionaries Copy class Metadata ( BaseModel ): properties: dict[ str , str ] # string -> string counts: dict[ str , int ] # string -> int complex : dict[ str , list[ float ]] # string -> list of floats Tuples Copy class Coordinate ( BaseModel ): point: tuple[ float , float ] # exactly 2 floats named: tuple[ str , int , bool ] # mixed types variadic: tuple[ int , ... ] # variable length FrozenSet Copy class Config ( BaseModel ): allowed: frozenset[ str ] TypedDict Support Copy from typing import TypedDict class Movie ( TypedDict ): title: str year: int class Catalog ( BaseModel ): movies: list[Movie]
+
+### Unions and Optional Types
+
+Path: `/unions-optionals.html`
+
+Union types, Optional, and nullable fields in Pydantic
+
+Optional Fields Copy class Profile ( BaseModel ): name: str bio: str | None = None # Optional[str] age: int | None = None # Optional[int] Union Types Copy class Result ( BaseModel ): value: str | int | float # any of these types status: int | str # int or string Discriminated Unions Use Discriminator for tagged unions: Copy from pydantic import BaseModel, Discriminator from typing import Literal, Union class Cat ( BaseModel ): pet_type: Literal[ "cat" ] meows: bool class Dog ( BaseModel ): pet_type: Literal[ "dog" ] barks: bool class Pet ( BaseModel ): pet: Cat | Dog = Field( discriminator = "pet_type" ) None Handling Copy class NullableModel ( BaseModel ): required: str nullable: str | None = None optional_default: str = "default" # model_config = ConfigDict(coerce_numbers_to_str=True)
+
+### Custom Types
+
+Path: `/custom-types.html`
+
+Create custom field types, constrained types, and new type definitions
+
+Constrained Types Copy from pydantic import BaseModel from pydantic.types import ( PositiveInt, NegativeInt, NonNegativeInt, PositiveFloat, NonNegativeFloat, ConstrainedStr, ConstrainedInt, ) class Inventory ( BaseModel ): quantity: PositiveInt temperature: NonNegativeFloat code: str = Field( min_length = 5 , max_length = 20 ) Type Aliases Copy from typing import Annotated from pydantic import Field HexColor = Annotated[ str , Field( pattern = r " ^ # [ 0-9a-fA-F ] {6} $ " )] PhoneNumber = Annotated[ str , Field( pattern = r " ^ \+ ? 1 ? \d {10} $ " )] class Contact ( BaseModel ): color: HexColor phone: PhoneNumber Custom Types Copy from pydantic import GetCoreSchemaHandler from pydantic_core import CoreSchema, core_schema class Sku ( str ): @ classmethod def __get_pydantic_core_schema__ ( cls , handler : GetCoreSchemaHandler ) -> CoreSchema: return core_schema.with_default_schema( core_schema.str_schema( pattern = r " ^ SKU- \d {4} $ " ) ) class Product ( BaseModel ): sku: Sku
+
+### Generic Models
+
+Path: `/generic-models.html`
+
+Create reusable generic models with type parameters in Pydantic
+
+Generic BaseModel Copy from typing import Generic, TypeVar from pydantic import BaseModel T = TypeVar( "T" ) class Response ( BaseModel , Generic[T]): data: T message: str status: int = 200 Usage Copy # String response str_resp = Response[ str ]( data = "hello" , message = "ok" ) # Dict response dict_resp = Response[ dict ]( data = { "key" : "value" }, message = "found" ) # Nested generic class Page ( BaseModel , Generic[T]): items: list[T] total: int page: int user_page = Page[User]( items = [user1, user2], total = 2 , page = 1 ) Multiple Type Parameters Copy K = TypeVar( "K" ) V = TypeVar( "V" ) class MapEntry ( BaseModel , Generic[K, V]): key: K value: V entry = MapEntry[ int , str ]( key = 1 , value = "one" )
+
+### JSON Schema
+
+Path: `/json-schema.html`
+
+Generate JSON Schema from Pydantic models
+
+Generate JSON Schema Copy from pydantic import BaseModel class Product ( BaseModel ): name: str price: float tags: list[ str ] = [] schema = Product.model_json_schema() print (schema) # { # "title": "Product", # "type": "object", # "properties": { # "name": {"title": "Name", "type": "string"}, # "price": {"title": "Price", "type": "number"}, # "tags": {"title": "Tags", "type": "array", "items": {"type": "string"}} # }, # "required": ["name", "price"] # } Custom Schema Copy from pydantic import Field class Item ( BaseModel ): name: str = Field( json_schema_extra = { "example" : "Widget" }) secret: str = Field( json_schema_extra = { "writeOnly" : True }) Schema Options Copy # Generate with $defs for recursive models Product.model_json_schema( ref_template = "/schemas/ {model} .json" ) # Schema with by_alias Product.model_json_schema( by_alias = True )
+
+### TypeAdapter
+
+Path: `/type-adapter.html`
+
+Validate non-model types with TypeAdapter
+
+TypeAdapter Basics Use TypeAdapter to validate types outside of a BaseModel: Copy from pydantic import TypeAdapter # Validate a simple type int_adapter = TypeAdapter( int ) int_adapter.validate_python( "42" ) # 42 # Validate a complex type list_adapter = TypeAdapter(list[ int ]) list_adapter.validate_python([ 1 , 2 , 3 ]) JSON Validation Copy adapter = TypeAdapter(list[dict[ str , int ]]) data = adapter.validate_json( '[{"a": 1, "b": 2}]' ) Nested Types Copy from typing import TypedDict class Stock ( TypedDict ): symbol: str price: float adapter = TypeAdapter(list[Stock]) stocks = adapter.validate_python([ { "symbol" : "AAPL" , "price" : 150.0 } ]) Serialization Copy adapter = TypeAdapter(list[ int ]) adapter.dump_python([ 1 , 2 , 3 ]) adapter.dump_json([ 1 , 2 , 3 ])
+
+### Error Handling
+
+Path: `/error-handling.html`
+
+Understanding and customizing Pydantic validation errors
+
+ValidationError When validation fails, Pydantic raises ValidationError : Copy from pydantic import BaseModel, ValidationError class User ( BaseModel ): name: str age: int try : User( name = "Alice" , age = "not_a_number" ) except ValidationError as e: print (e.errors()) # [{"type": "int_parsing", "loc": ["age"], # "msg": "Input should be a valid integer", # "input": "not_a_number"}] Error Structure Copy [ { "type" : "string_pattern_mismatch" , "loc" : [ "code" ], "msg" : "String should match pattern '^[A-Z]+ ## Custom Error Messages ```python class Product(BaseModel): name: str = Field(min_length=1, error=" Product name is required ") price: float = Field(gt=0, error=" Price must be positive ") Multiple Errors Pydantic collects all validation errors before raising, unlike standard Python exceptions: Copy try : User( name = 123 , age = "invalid" ) except ValidationError as e: print ( len (e.errors())) # 2 errors collected ", "input": "abc123", "ctx": {"pattern": "^[A-Z]+$"} } ] Copy ## Custom Error Messages ```python class Product(BaseModel): name: str = Field(min_length=1, error="Product name is required") price: float = Field(gt=0, error="Price must be positive") Multiple Errors Pydantic collects all validation errors before raising, unlike standard Python exceptions: Copy try : User( name = 123 , age = "invalid" ) except ValidationError as e: print ( len (e.errors())) # 2 errors collected
+
+### Aliases
+
+Path: `/aliases.html`
+
+Field aliases for JSON field name mapping
+
+Field Aliases Map Python field names to different JSON names: Copy from pydantic import BaseModel, Field class User ( BaseModel ): first_name: str = Field( alias = "firstName" ) last_name: str = Field( alias = "lastName" ) email_address: str = Field( alias = "email" ) user = User.model_validate({ "firstName" : "Alice" , "lastName" : "Smith" , "email" : "alice@example.com" }) print (user.first_name) # "Alice" Alias Generator Copy from pydantic import ConfigDict class CamelModel ( BaseModel ): model_config = ConfigDict( alias_generator = lambda s : "" .join( word.capitalize() if i > 0 else word for i, word in enumerate (s.split( "_" )) ), populate_by_name = True , ) first_name: str last_name: str # Accepts {"FirstName": "Alice", "LastName": "Smith"} # or {"first_name": "Alice", "last_name": "Alice"} Serialization with Aliases Copy user.model_dump( by_alias = True ) # {"firstName": "Alice", "lastName": "Smith"}

@@ -1,0 +1,11 @@
+{
+  "name": "pydantic-docs",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://pydantic-docs.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pydantic/pydantic"
+  },
+  "description": "Community documentation for Pydantic — Python data validation using Python type hints"
+}
