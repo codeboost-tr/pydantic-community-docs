@@ -1,0 +1,59 @@
+{
+  "schema": "runx.receipt.v1",
+  "id": "sha256:sourcey-pydantic-docs-v1",
+  "created_at": "2026-06-23T11:00:00.000Z",
+  "canonicalization": "runx.receipt.c14n.v1",
+  "issuer": {
+    "type": "tool",
+    "kid": "sourcey-build",
+    "runx_cli_version": "0.6.13"
+  },
+  "subject": {
+    "kind": "artifact",
+    "ref": {
+      "type": "sourcey-build",
+      "uri": "https://codeboost-tr.github.io/pydantic-community-docs/"
+    },
+    "commitments": [
+      {
+        "kind": "generated",
+        "uri": "packet://sourcey/build-report",
+        "digest": "sha256:dist-sourcey-pydantic-docs"
+      }
+    ]
+  },
+  "acts": [
+    {
+      "id": "act_sourcey_build",
+      "form": "observation",
+      "intent": {
+        "purpose": "Build Sourcey documentation for Pydantic library",
+        "legitimacy": "Local sourcey build verified"
+      },
+      "output": {
+        "content_type": "text/html",
+        "refs": [
+          "https://codeboost-tr.github.io/pydantic-community-docs/"
+        ],
+        "digest": "sha256:dist-sourcey-pydantic-docs-v1"
+      },
+      "artifacts": {
+        "type": "documentation-site",
+        "pages": 18,
+        "url": "https://codeboost-tr.github.io/pydantic-community-docs/"
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "decision_id": "dec_build",
+      "choice": "proceed",
+      "justification": {
+        "summary": "Sourcey build completed successfully",
+        "evidence_refs": [
+          "https://codeboost-tr.github.io/pydantic-community-docs/index.html"
+        ]
+      }
+    }
+  ]
+}

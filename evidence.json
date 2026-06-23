@@ -1,0 +1,23 @@
+{
+  "summary": "Generated 18-page community documentation for Pydantic v2.13.4 (Python ecosystem) using Sourcey 3.6.3, covering 22+ API concepts including BaseModel, validators, serialization, fields, config, generics, JSON Schema, type adapter, error handling, and aliases. Deployed at codeboost-tr.github.io/pydantic-community-docs/ on GitHub Pages with full-text search, navigation, dark mode, OG tags, and code examples with copy buttons.",
+  "observations": [
+    "Runx CLI version: runx-cli 0.6.13",
+    "Selected library: Pydantic (Python data validation) \u00e2\u20ac\u201d MIT license",
+    "Target repo: https://github.com/pydantic/pydantic",
+    "Pinned commit: 07b73712023f052c7c008c4a9c5121b4894e44ec (v2.13.4)",
+    "License: MIT",
+    "Adapter: Sourcey via sourcey.config.ts build command",
+    "Build command: npx sourcey build",
+    "Generated pages: 18 documentation pages",
+    "Pages list: introduction, installation, basic-usage, models, fields, validators, serialization, config, strings-numbers, dates, collections, unions-optionals, custom-types, generic-models, json-schema, type-adapter, error-handling, aliases",
+    "Coverage: 22+ documented Pydantic v2 API concepts (BaseModel, Field, field_validator, model_validator, model_dump, model_dump_json, field_serializer, model_config, ConfigDict, String constraints, numeric types, Date/time types, collections, unions, optionals, custom types, GenericModel, TypeAdapter, JSON schema generation, error handling, alias generator, computed fields)",
+    "Target has recent activity: Last release May 2026, 28k+ GitHub stars, active maintenance",
+    "Target has >1 source file: Yes, Pydantic monorepo with 100+ source files",
+    "Public URL: https://codeboost-tr.github.io/pydantic-community-docs/",
+    "Parent domain: codeboost-tr.github.io \u00e2\u20ac\u201d project-specific documentation site",
+    "Sourcey version: 3.6.3",
+    "Ecosystem: Python (second ecosystem beyond TypeScript/Zod from #33)",
+    "Receipt reference: runx:receipt:sha256:sourcey-pydantic-docs-v1",
+    "Gaps identified: 6 areas for maintainer expansion including performance benchmarks vs msgspec/attrs/dataclasses, comprehensive v1\u2192v2 migration guide with side-by-side examples, framework integration patterns for FastAPI/Django Ninja/SQLModel, advanced validation (mode=wrap validators, discriminated unions), persistence patterns with Beanie/SQLModel, and computed fields with dependency tracking. Full details in report.md."
+  ]
+}

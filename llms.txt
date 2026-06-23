@@ -1,0 +1,24 @@
+# Pydantic Docs
+
+> What is Pydantic and how it brings runtime validation to Python type hints
+
+## Documentation
+
+- [Introduction](/introduction.html): What is Pydantic and how it brings runtime validation to Python type hints
+- [Installation](/installation.html): Install Pydantic via pip, uv, or poetry
+- [Basic Usage](/basic-usage.html): Create your first Pydantic model and validate data
+- [Models](/models.html): Define and configure Pydantic models with BaseModel
+- [Fields](/fields.html): Field definitions with constraints, defaults, and metadata
+- [Validators](/validators.html): Custom validation with field_validator and model_validator
+- [Serialization](/serialization.html): Convert Pydantic models to dict, JSON, and custom formats
+- [Configuration](/config.html): Model configuration with ConfigDict for behavior customization
+- [String and Number Types](/strings-numbers.html): Pydantic field types for strings, numbers, and booleans
+- [Date and Time Types](/dates.html): Date, time, datetime, timedelta, and duration field types
+- [Collections and Mapping Types](/collections.html): List, set, dict, tuple, and other collection types in Pydantic
+- [Unions and Optional Types](/unions-optionals.html): Union types, Optional, and nullable fields in Pydantic
+- [Custom Types](/custom-types.html): Create custom field types, constrained types, and new type definitions
+- [Generic Models](/generic-models.html): Create reusable generic models with type parameters in Pydantic
+- [JSON Schema](/json-schema.html): Generate JSON Schema from Pydantic models
+- [TypeAdapter](/type-adapter.html): Validate non-model types with TypeAdapter
+- [Error Handling](/error-handling.html): Understanding and customizing Pydantic validation errors
+- [Aliases](/aliases.html): Field aliases for JSON field name mapping
